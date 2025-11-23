@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#000000">
+  <title>Playing Playlist</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    #player-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #player {
+      width: 100%;
+      height: 100%;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: 2px solid white;
+      padding: 15px 30px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 1000;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.3s, transform 0.1s;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.9);
+      color: black;
+      transform: scale(1.05);
+    }
+
+    .back-button:active {
+      transform: scale(0.95);
+    }
+
+    .playlist-title {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 15px 30px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 10px;
+      z-index: 1000;
+    }
+
+    .error-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      color: black;
+      padding: 40px;
+      border-radius: 15px;
+      font-size: 24px;
+      text-align: center;
+      max-width: 80%;
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-button">← Back</a>
+  <div id="playlist-name" class="playlist-title"></div>
+  <div id="player-container">
+    <div id="player"></div>
+  </div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    // Get playlist ID and name from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const playlistId = urlParams.get('id');
+    const playlistName = urlParams.get('name');
+
+    // Display playlist name
+    if (playlistName) {
+      document.getElementById('playlist-name').textContent = playlistName;
+    }
+
+    // Check if we have a playlist ID
+    if (!playlistId || playlistId === 'REPLACE_WITH_PLAYLIST_ID') {
+      document.getElementById('player-container').innerHTML = `
+        <div class="error-message">
+          <h2>Playlist Not Configured</h2>
+          <p>Please update the playlist ID in config.js</p>
+          <br>
+          <a href="index.html" style="color: #0066cc; text-decoration: none; font-weight: bold;">← Go Back</a>
+        </div>
+      `;
+    } else {
+      let player;
+
+      // This function creates an <iframe> and YouTube player after the API code downloads
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+          height: '100%',
+          width: '100%',
+          playerVars: {
+            listType: 'playlist',
+            list: playlistId,
+            autoplay: 1,
+            // Standard controls enabled (as requested)
+            controls: 1,
+            // No related videos from other channels at the end
+            rel: 0,
+            // Modest branding (smaller YouTube logo)
+            modestbranding: 1,
+            // Enable keyboard controls
+            disablekb: 0,
+            // Enable fullscreen button
+            fs: 1,
+            // Loop the playlist
+            loop: 1
+          },
+          events: {
+            'onReady': onPlayerReady,
+            'onError': onPlayerError
+          }
+        });
+      }
+
+      // The API will call this function when the video player is ready
+      function onPlayerReady(event) {
+        // Enable shuffle and start at random video
+        try {
+          // First, enable shuffle
+          event.target.setShuffle(true);
+          console.log('Shuffle enabled via setShuffle');
+        } catch (e) {
+          console.log('setShuffle not available:', e);
+        }
+
+        // Get the playlist and start at a random video
+        setTimeout(() => {
+          try {
+            const playlist = event.target.getPlaylist();
+            if (playlist && playlist.length > 0) {
+              // Enable shuffle again after playlist loads
+              event.target.setShuffle(true);
+
+              // Pick a random video index from the playlist
+              const randomIndex = Math.floor(Math.random() * playlist.length);
+              console.log(`Starting at random video ${randomIndex} of ${playlist.length}`);
+
+              // Play the random video
+              event.target.playVideoAt(randomIndex);
+            }
+          } catch (e) {
+            console.log('Could not start at random video:', e);
+            // Fallback: just start playing normally
+            event.target.playVideo();
+          }
+        }, 1000);
+
+        // Additional shuffle attempt for reliability
+        setTimeout(() => {
+          try {
+            event.target.setShuffle(true);
+            console.log('Shuffle re-enabled after playback started');
+          } catch (e) {
+            console.log('Final shuffle attempt failed:', e);
+          }
+        }, 2000);
+      }
+
+      function onPlayerError(event) {
+        console.error('YouTube player error:', event.data);
+        document.getElementById('player-container').innerHTML = `
+          <div class="error-message">
+            <h2>Error Loading Playlist</h2>
+            <p>Could not load the YouTube playlist.</p>
+            <p style="font-size: 16px; margin-top: 10px;">Error code: ${event.data}</p>
+            <br>
+            <a href="index.html" style="color: #0066cc; text-decoration: none; font-weight: bold;">← Go Back</a>
+          </div>
+        `;
+      }
+
+      // Make onYouTubeIframeAPIReady available globally
+      window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+/* Global styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.title {
+  color: white;
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 50px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Playlist grid */
+.playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  padding: 20px;
+}
+
+/* Playlist buttons */
+.playlist-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  text-decoration: none;
+  color: #1a1a2e;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  min-height: 350px;
+}
+
+.playlist-button:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.playlist-button:active {
+  transform: translateY(-5px) scale(0.98);
+}
+
+/* Playlist icons */
+.playlist-icon {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  margin-bottom: 25px;
+  border-radius: 15px;
+}
+
+/* Icon placeholder (for missing images) */
+.icon-placeholder {
+  width: 180px;
+  height: 180px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  font-weight: bold;
+  color: white;
+  border-radius: 15px;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+}
+
+/* Playlist names */
+.playlist-name {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: #1a1a2e;
+  word-wrap: break-word;
+  line-height: 1.3;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+  }
+
+  .playlist-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .playlist-button {
+    padding: 30px;
+    min-height: 300px;
+  }
+
+  .playlist-icon,
+  .icon-placeholder {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+  }
+
+  .icon-placeholder {
+    font-size: 60px;
+  }
+
+  .playlist-name {
+    font-size: 1.5rem;
+  }
+}
+
+/* Extra large buttons for accessibility */
+@media (min-width: 1200px) {
+  .playlist-button {
+    padding: 50px;
+    min-height: 400px;
+  }
+
+  .playlist-icon,
+  .icon-placeholder {
+    width: 200px;
+    height: 200px;
+    margin-bottom: 30px;
+  }
+
+  .icon-placeholder {
+    font-size: 90px;
+  }
+
+  .playlist-name {
+    font-size: 2.5rem;
+  }
+}

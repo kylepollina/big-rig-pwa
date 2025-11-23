@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1a1a1a">
+  <title>Video Playlists</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Choose a Playlist</h1>
+    <div id="playlist-grid" class="playlist-grid">
+      <!-- Buttons will be generated here by JavaScript -->
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script>
+    // Function to extract playlist ID from URL or return as-is if already an ID
+    function extractPlaylistId(urlOrId) {
+      // If it's already just an ID (no http/https), return it
+      if (!urlOrId.startsWith('http')) {
+        return urlOrId;
+      }
+
+      // Parse the URL to extract the playlist ID
+      try {
+        const url = new URL(urlOrId);
+        const listParam = url.searchParams.get('list');
+        if (listParam) {
+          return listParam;
+        }
+        // If no list parameter found, return original (might be an ID)
+        return urlOrId;
+      } catch (e) {
+        // If URL parsing fails, assume it's already an ID
+        return urlOrId;
+      }
+    }
+
+    // Generate playlist buttons from config
+    const grid = document.getElementById('playlist-grid');
+
+    playlists.forEach((playlist, index) => {
+      // Extract playlist ID from URL or use as-is
+      const playlistId = extractPlaylistId(playlist.url);
+
+      const button = document.createElement('a');
+      button.href = `playlist.html?id=${encodeURIComponent(playlistId)}&name=${encodeURIComponent(playlist.name)}`;
+      button.className = 'playlist-button';
+
+      const icon = document.createElement('img');
+      icon.src = playlist.icon;
+      icon.alt = playlist.name;
+      icon.className = 'playlist-icon';
+      icon.onerror = function() {
+        // If icon fails to load, show a placeholder with first letter
+        this.style.display = 'none';
+        const placeholder = document.createElement('div');
+        placeholder.className = 'icon-placeholder';
+        placeholder.textContent = playlist.name.charAt(0);
+        button.insertBefore(placeholder, button.firstChild);
+      };
+
+      const name = document.createElement('div');
+      name.className = 'playlist-name';
+      name.textContent = playlist.name;
+
+      button.appendChild(icon);
+      button.appendChild(name);
+      grid.appendChild(button);
+    });
+  </script>
+</body>
+</html>
